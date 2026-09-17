@@ -37,7 +37,8 @@ def create_synthetic_face_video(output_path: str, duration_sec: int = 2, fps: in
             continue
 
     if out is None or not out.isOpened():
-        raise RuntimeError(f"Could not open VideoWriter for path {output_path}")
+        fourcc = 0
+        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
     try:
         for i in range(total_frames):
