@@ -4,7 +4,7 @@ Production-style AI/ML platform for detecting synthetic and deepfake video conte
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 This platform analyzes uploaded videos through multiple complementary detection techniques to deliver interpretable, evidence-backed synthetic media analysis through an interactive web dashboard.
 
@@ -19,7 +19,7 @@ This platform analyzes uploaded videos through multiple complementary detection 
 
 ---
 
-## 🏗️ Multi-Signal Detection Architecture
+## Multi-Signal Detection Architecture
 
 ```text
                  INPUT VIDEO
@@ -59,7 +59,7 @@ This platform analyzes uploaded videos through multiple complementary detection 
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 deepfake/
@@ -85,7 +85,7 @@ deepfake/
 
 ---
 
-## 🗺️ 16-Phase Development Roadmap
+## Development Roadmap
 
 - [x] **Phase 1**: Project Structure & Environment Setup
 - [x] **Phase 2**: Dataset Preparation & Preprocessing Pipeline
@@ -106,7 +106,7 @@ deepfake/
 
 ---
 
-## 🔗 REST API Reference Table
+## REST API Reference Table
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -120,13 +120,13 @@ deepfake/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Local Python Environment
 ```bash
 # Clone repository
-git clone https://github.com/your-username/deepfake-platform.git
-cd deepfake-platform
+git clone https://github.com/KunwarSidhu47/Synthetic-Media-Detection-Platform.git
+cd Synthetic-Media-Detection-Platform
 
 # Create virtual environment
 python3 -m venv .venv
@@ -157,13 +157,3 @@ docker-compose up --build
 pytest tests/
 # Output: 32 passed in 4.25s
 ```
-
----
-
-## 💼 Resume Accomplishment Bullets
-
-**Synthetic Media Detection & Analysis Platform | Python, PyTorch, ViT, Bi-LSTM, FastAPI, React**
-- Developed a multimodal deepfake detection pipeline combining **Vision Transformer (ViT-B/16) spatial analysis, 2D FFT frequency-domain spectral analysis, and Bi-LSTM temporal sequence modeling**.
-- Engineered **FastAPI REST inference APIs** and an interactive React dashboard with Recharts for confidence visualization, suspicious-frame timeline inspection, and markdown report generation.
-- Integrated an **LLM explanation layer with structured prompt guardrails** to convert quantitative model metadata into human-interpretable forensic explanations with responsible-AI safeguards.
-- Containerized and automated the application using **Docker, Docker Compose, GitHub Actions CI/CD, and AWS cloud deployment architecture (EC2 + S3 + RDS)**.
