@@ -16,11 +16,20 @@ def create_authentic_test_video(output_path: str, duration_sec: int = 3, fps: in
     width, height = 640, 480
     total_frames = duration_sec * fps
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-    if not out.isOpened():
-        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    codecs = ['mp4v', 'MJPG', 'XVID', 'avc1', 'H264']
+    out = None
+    for c in codecs:
+        try:
+            fourcc = cv2.VideoWriter_fourcc(*c)
+            writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            if writer.isOpened():
+                out = writer
+                break
+        except Exception:
+            continue
+
+    if out is None or not out.isOpened():
+        raise RuntimeError(f"Could not open VideoWriter for path {output_path}")
 
     try:
         for i in range(total_frames):
@@ -63,11 +72,20 @@ def create_synthetic_test_video(output_path: str, duration_sec: int = 3, fps: in
     width, height = 640, 480
     total_frames = duration_sec * fps
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-    if not out.isOpened():
-        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    codecs = ['mp4v', 'MJPG', 'XVID', 'avc1', 'H264']
+    out = None
+    for c in codecs:
+        try:
+            fourcc = cv2.VideoWriter_fourcc(*c)
+            writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            if writer.isOpened():
+                out = writer
+                break
+        except Exception:
+            continue
+
+    if out is None or not out.isOpened():
+        raise RuntimeError(f"Could not open VideoWriter for path {output_path}")
 
     try:
         np.random.seed(42)
