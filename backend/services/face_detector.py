@@ -31,11 +31,12 @@ class FaceDetector:
 
         if MEDIAPIPE_AVAILABLE:
             try:
-                self.mp_face_detection = mp.solutions.face_detection
-                self.detector = self.mp_face_detection.FaceDetection(
-                    min_detection_confidence=min_detection_confidence,
-                    model_selection=0
-                )
+                if hasattr(mp, "solutions") and hasattr(mp.solutions, "face_detection"):
+                    self.mp_face_detection = mp.solutions.face_detection
+                    self.detector = self.mp_face_detection.FaceDetection(
+                        min_detection_confidence=min_detection_confidence,
+                        model_selection=0
+                    )
             except Exception as e:
                 print(f"Warning: Failed to initialize MediaPipe Face Detection: {e}")
 
