@@ -3,6 +3,7 @@ Face Detector Service using MediaPipe for facial bounding box extraction and pre
 """
 
 from typing import Optional, Tuple, List
+import os
 import cv2
 import numpy as np
 
