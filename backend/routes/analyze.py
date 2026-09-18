@@ -80,6 +80,15 @@ def analyze_video(request: AnalyzeRequest = Body(...)):
                 break
 
     if not target_path or not os.path.exists(target_path):
+        # Auto-generate sample video if a demo sample path was requested but missing on server disk
+        if target_path and "data/raw/" in target_path:
+            try:
+                from scripts.generate_test_video import create_synthetic_face_video
+                create_synthetic_face_video(target_path)
+            except Exception as gen_err:
+                print(f"Warning: Failed to auto-generate demo sample: {gen_err}")
+
+    if not target_path or not os.path.exists(target_path):
         raise HTTPException(
             status_code=404,
             detail="Video file not found. Provide a valid 'video_path' or uploaded 'file_id'."
