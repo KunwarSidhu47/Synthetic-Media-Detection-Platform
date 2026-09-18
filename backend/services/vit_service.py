@@ -4,11 +4,22 @@ Vision Transformer Spatial Service for deepfake face crop inference.
 
 from typing import List, Tuple, Optional
 import numpy as np
-import torch
-import torch.nn.functional as F
+# torch is optional — loaded lazily if installed (not required on Render free tier)
+try:
+    import torch
+    import torch.nn.functional as F
+    _TORCH_AVAILABLE = True
+except ImportError:
+    torch = None  # type: ignore
+    F = None      # type: ignore
+    _TORCH_AVAILABLE = False
 
-from models.vit_classifier import ViTClassifier
 from backend.schemas.detection import SpatialCropAnalysis
+# ViTClassifier is also optional — only importable when torch is present
+try:
+    from models.vit_classifier import ViTClassifier
+except Exception:
+    ViTClassifier = None  # type: ignore
 
 
 class ViTSpatialService:
@@ -52,7 +63,8 @@ class ViTSpatialService:
         """
         Convert (224, 224, 3) RGB uint8 image array to normalized (1, 3, 224, 224) float PyTorch tensor.
         """
-        import torch
+        if not _TORCH_AVAILABLE:
+            return None
         if image_rgb.shape[:2] != (224, 224):
             import cv2
             image_rgb = cv2.resize(image_rgb, (224, 224), interpolation=cv2.INTER_AREA)
@@ -63,7 +75,6 @@ class ViTSpatialService:
         tensor_chw = torch.from_numpy(norm_img.transpose(2, 0, 1)).float()
         return tensor_chw.unsqueeze(0)  # (1, 3, 224, 224)
 
-    @torch.no_grad()
     def predict_crop(self, image_rgb: np.ndarray) -> SpatialCropAnalysis:
         """
         Perform spatial analysis on a single RGB face crop.
@@ -105,7 +116,6 @@ class ViTSpatialService:
             feature_embedding=feature_vec
         )
 
-    @torch.no_grad()
     def predict_batch(self, images_rgb: List[np.ndarray]) -> List[SpatialCropAnalysis]:
         """
         Perform batched spatial analysis on multiple RGB face crops.

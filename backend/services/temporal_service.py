@@ -4,11 +4,22 @@ Temporal Analysis Service using Bi-LSTM for frame sequence consistency evaluatio
 
 from typing import List, Optional, Tuple
 import numpy as np
-import torch
-import torch.nn.functional as F
+# torch is optional — loaded lazily if installed (not required on Render free tier)
+try:
+    import torch
+    import torch.nn.functional as F
+    _TORCH_AVAILABLE = True
+except ImportError:
+    torch = None  # type: ignore
+    F = None      # type: ignore
+    _TORCH_AVAILABLE = False
 
-from models.lstm_temporal import LSTMTemporalModel
 from backend.schemas.detection import TemporalAnalysisResult
+# LSTMTemporalModel is also optional — only importable when torch is present
+try:
+    from models.lstm_temporal import LSTMTemporalModel
+except Exception:
+    LSTMTemporalModel = None  # type: ignore
 
 
 class LSTMTemporalService:
@@ -101,7 +112,6 @@ class LSTMTemporalService:
 
         return suspicious_indices
 
-    @torch.no_grad()
     def predict_sequence(self, feature_sequence: List[List[float]]) -> TemporalAnalysisResult:
         """
         Analyze a sequence of 768-dim frame feature vectors using Bi-LSTM.
