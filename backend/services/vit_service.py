@@ -15,42 +15,44 @@ class ViTSpatialService:
     """Service to handle Vision Transformer spatial inference on preprocessed facial crops."""
 
     def __init__(self, checkpoint_path: Optional[str] = None, device: Optional[str] = None, pretrained: bool = False):
-        """
-        Initialize ViTSpatialService.
-        
-        Args:
-            checkpoint_path: Optional path to custom trained weights (.pt/.pth).
-            device: Optional device override ('cpu', 'cuda', 'mps'). If None, automatically detected.
-            pretrained: Whether to download pre-trained ImageNet weights (default False for fast unit testing).
-        """
-        if device is None:
-            if torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-                self.device = torch.device("mps")
+        self.model = None
+        self.device = None
+
+        try:
+            import torch
+            if device is None:
+                if torch.cuda.is_available():
+                    self.device = torch.device("cuda")
+                elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                    self.device = torch.device("mps")
+                else:
+                    self.device = torch.device("cpu")
             else:
-                self.device = torch.device("cpu")
-        else:
-            self.device = torch.device(device)
+                self.device = torch.device(device)
 
-        self.model = ViTClassifier(num_classes=2, pretrained=pretrained).to(self.device)
-        self.model.eval()
+            from models.vit_classifier import ViTClassifier
+            self.model = ViTClassifier(num_classes=2, pretrained=pretrained).to(self.device)
+            self.model.eval()
 
-        if checkpoint_path and torch.cuda.is_available():
-            try:
-                state_dict = torch.load(checkpoint_path, map_location=self.device)
-                self.model.load_state_dict(state_dict)
-            except Exception as e:
-                print(f"Warning: Could not load custom checkpoint from {checkpoint_path}: {e}")
+            if checkpoint_path and torch.cuda.is_available():
+                try:
+                    state_dict = torch.load(checkpoint_path, map_location=self.device)
+                    self.model.load_state_dict(state_dict)
+                except Exception as e:
+                    print(f"Warning: Could not load custom checkpoint: {e}")
+        except Exception as e:
+            print(f"Notice: Running ViTSpatialService in lightweight signal mode: {e}")
+            self.model = None
 
         # ImageNet normalization statistics
         self.mean = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(1, 1, 3)
         self.std = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(1, 1, 3)
 
-    def _preprocess_image(self, image_rgb: np.ndarray) -> torch.Tensor:
+    def _preprocess_image(self, image_rgb: np.ndarray):
         """
         Convert (224, 224, 3) RGB uint8 image array to normalized (1, 3, 224, 224) float PyTorch tensor.
         """
+        import torch
         if image_rgb.shape[:2] != (224, 224):
             import cv2
             image_rgb = cv2.resize(image_rgb, (224, 224), interpolation=cv2.INTER_AREA)

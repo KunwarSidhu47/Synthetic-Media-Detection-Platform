@@ -28,25 +28,34 @@ class LSTMTemporalService:
             device: Device override ('cpu', 'cuda', 'mps').
             input_dim: Feature dimension per frame (default 768 for ViT).
         """
-        if device is None:
-            if torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-                self.device = torch.device("mps")
+        self.model = None
+        self.device = None
+
+        try:
+            import torch
+            if device is None:
+                if torch.cuda.is_available():
+                    self.device = torch.device("cuda")
+                elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                    self.device = torch.device("mps")
+                else:
+                    self.device = torch.device("cpu")
             else:
-                self.device = torch.device("cpu")
-        else:
-            self.device = torch.device(device)
+                self.device = torch.device(device)
 
-        self.model = LSTMTemporalModel(input_dim=input_dim).to(self.device)
-        self.model.eval()
+            from models.lstm_temporal import LSTMTemporalModel
+            self.model = LSTMTemporalModel(input_dim=input_dim).to(self.device)
+            self.model.eval()
 
-        if checkpoint_path:
-            try:
-                state_dict = torch.load(checkpoint_path, map_location=self.device)
-                self.model.load_state_dict(state_dict)
-            except Exception as e:
-                print(f"Warning: Could not load custom LSTM weights from {checkpoint_path}: {e}")
+            if checkpoint_path:
+                try:
+                    state_dict = torch.load(checkpoint_path, map_location=self.device)
+                    self.model.load_state_dict(state_dict)
+                except Exception as e:
+                    print(f"Warning: Could not load custom checkpoint: {e}")
+        except Exception as e:
+            print(f"Notice: Running LSTMTemporalService in lightweight sequence mode: {e}")
+            self.model = None
 
     def detect_suspicious_frames(
         self,
