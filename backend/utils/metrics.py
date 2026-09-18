@@ -2,9 +2,8 @@
 Model evaluation metrics utility functions.
 """
 
-from typing import List, Union
+from typing import List, Union, Optional
 import numpy as np
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 
 from backend.schemas.detection import EvaluationMetrics
 
@@ -14,6 +13,7 @@ def compute_evaluation_metrics(
     y_pred: Union[List[int], np.ndarray],
     y_prob: Optional[Union[List[float], np.ndarray]] = None
 ) -> EvaluationMetrics:
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
     """
     Compute classification metrics: Accuracy, Precision, Recall, F1-score, ROC-AUC, and Confusion Matrix.
     
