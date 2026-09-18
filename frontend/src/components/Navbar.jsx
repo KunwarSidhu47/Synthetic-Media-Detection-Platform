@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, Activity, CheckCircle2 } from 'lucide-react';
 
+import { API_BASE } from '../config';
+
 export default function Navbar() {
   const [health, setHealth] = useState({ status: 'checking', torch_device: 'cpu' });
 
   useEffect(() => {
-    fetch('/api/health')
+    fetch(`${API_BASE}/api/health`)
       .then(res => res.json())
       .then(data => setHealth(data))
       .catch(() => setHealth({ status: 'offline', torch_device: 'unknown' }));

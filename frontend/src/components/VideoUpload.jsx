@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Upload, FileVideo, Play, Sparkles, AlertCircle } from 'lucide-react';
 
+import { API_BASE } from '../config';
+
 export default function VideoUpload({ onAnalysisComplete, loading, setLoading }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [sampleRate, setSampleRate] = useState(10);
@@ -25,7 +27,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const uploadRes = await fetch('/api/upload', {
+      const uploadRes = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -38,7 +40,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
       setUploadProgress(60);
       const uploadData = await uploadRes.json();
 
-      const analyzeRes = await fetch('/api/analyze', {
+      const analyzeRes = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -67,7 +69,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
     setLoading(true);
     setErrorMsg(null);
     try {
-      const analyzeRes = await fetch('/api/analyze', {
+      const analyzeRes = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

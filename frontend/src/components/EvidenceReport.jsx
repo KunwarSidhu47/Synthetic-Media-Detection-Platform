@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Download, ShieldCheck, Info, Cpu, Waves, Clock, Sparkles, AlertTriangle } from 'lucide-react';
 
+import { API_BASE } from '../config';
+
 export default function EvidenceReport({ result }) {
   const [activeTab, setActiveTab] = useState('llm');
   const [llmExplanation, setLlmExplanation] = useState(null);
@@ -9,7 +11,7 @@ export default function EvidenceReport({ result }) {
   useEffect(() => {
     if (result && result.analysis_id) {
       setLlmLoading(true);
-      fetch('/api/explain', {
+      fetch(`${API_BASE}/api/explain`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ analysis_id: result.analysis_id }),
@@ -37,7 +39,7 @@ export default function EvidenceReport({ result }) {
 
   const handleExportMarkdownReport = async () => {
     try {
-      const res = await fetch('/api/report', {
+      const res = await fetch(`${API_BASE}/api/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ analysis_id: result.analysis_id }),
