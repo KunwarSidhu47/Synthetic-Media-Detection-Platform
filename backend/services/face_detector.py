@@ -29,6 +29,16 @@ class FaceDetector:
         self.mp_face_detection = None
         self.detector = None
 
+        if MEDIAPIPE_AVAILABLE:
+            try:
+                self.mp_face_detection = mp.solutions.face_detection
+                self.detector = self.mp_face_detection.FaceDetection(
+                    min_detection_confidence=min_detection_confidence,
+                    model_selection=0
+                )
+            except Exception as e:
+                print(f"Warning: Failed to initialize MediaPipe Face Detection: {e}")
+
         import os
         self.cascade_path = os.path.abspath("models/haarcascade_frontalface_default.xml")
         self.face_cascade = None

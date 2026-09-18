@@ -12,6 +12,8 @@ from backend.schemas.detection import DetectionPipelineResult
 from backend.services.fusion_service import MultiSignalFusionService
 from backend.routes.results import RESULTS_STORE
 
+import gc
+
 router = APIRouter(tags=["Analysis"])
 
 # Initialize singleton MultiSignalFusionService instance
@@ -114,3 +116,5 @@ def analyze_video(request: AnalyzeRequest = Body(...)):
             status_code=500,
             detail=f"Error during video detection analysis: {str(e)}"
         )
+    finally:
+        gc.collect()
