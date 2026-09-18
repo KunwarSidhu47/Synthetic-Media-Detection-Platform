@@ -9,6 +9,8 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errorMsg, setErrorMsg] = useState(null);
 
+  const [statusText, setStatusText] = useState('');
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
@@ -21,6 +23,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
 
     setLoading(true);
     setErrorMsg(null);
+    setStatusText('Uploading video file...');
     setUploadProgress(20);
 
     try {
@@ -37,6 +40,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
         throw new Error(err.detail || 'Video upload failed');
       }
 
+      setStatusText('Extracting frames & running ViT, FFT & Bi-LSTM...');
       setUploadProgress(60);
       const uploadData = await uploadRes.json();
 
@@ -61,6 +65,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
       setErrorMsg(err.message);
     } finally {
       setLoading(false);
+      setStatusText('');
       setUploadProgress(0);
     }
   };
@@ -68,6 +73,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
   const handleDemoSample = async (videoPath) => {
     setLoading(true);
     setErrorMsg(null);
+    setStatusText('Analyzing demo video sample...');
     try {
       const analyzeRes = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
@@ -89,6 +95,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
       setErrorMsg(err.message);
     } finally {
       setLoading(false);
+      setStatusText('');
     }
   };
 
@@ -215,7 +222,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
         >
           {loading ? (
             <>
-              <div className="animate-pulse-slow">Processing Deepfake Pipeline...</div>
+              <div className="animate-pulse-slow">{statusText || 'Processing Deepfake Pipeline...'}</div>
             </>
           ) : (
             <>

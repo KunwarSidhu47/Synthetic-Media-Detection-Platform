@@ -89,7 +89,8 @@ def analyze_video(request: AnalyzeRequest = Body(...)):
         raise HTTPException(status_code=400, detail="sample_rate must be >= 1")
 
     try:
-        result = fusion_service.analyze_video(target_path, sample_rate=request.sample_rate)
+        # Cap max_frames=12 for fast processing on cloud free tier (0.1 CPU)
+        result = fusion_service.analyze_video(target_path, sample_rate=request.sample_rate, max_frames=12)
         # Store in in-memory repository and database
         RESULTS_STORE[result.analysis_id] = result
         try:
