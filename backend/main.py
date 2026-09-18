@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.routes import health, analyze, results, explain
+from backend.routes import health, analyze, results, explain, demo
 
 app = FastAPI(
     title="Synthetic Media Detection & Analysis Platform",
@@ -37,6 +37,7 @@ app.include_router(health.router, prefix="/api")
 app.include_router(analyze.router, prefix="/api")
 app.include_router(results.router, prefix="/api")
 app.include_router(explain.router, prefix="/api")
+app.include_router(demo.router, prefix="/api")
 
 # Serve uploaded video files statically for dashboard video playback
 upload_dir = os.path.abspath("data/raw")

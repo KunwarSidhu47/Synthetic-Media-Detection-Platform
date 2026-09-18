@@ -70,26 +70,19 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
     }
   };
 
-  const handleDemoSample = async (videoPath) => {
+  const handleDemoSample = async (sampleName) => {
     setLoading(true);
     setErrorMsg(null);
-    setStatusText('Analyzing demo video sample...');
+    setStatusText('Loading demo analysis...');
     try {
-      const analyzeRes = await fetch(`${API_BASE}/api/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          video_path: videoPath,
-          sample_rate: sampleRate,
-        }),
-      });
+      const demoRes = await fetch(`${API_BASE}/api/demo/${sampleName}`);
 
-      if (!analyzeRes.ok) {
-        const err = await analyzeRes.json();
+      if (!demoRes.ok) {
+        const err = await demoRes.json();
         throw new Error(err.detail || 'Demo sample analysis failed');
       }
 
-      const resultData = await analyzeRes.json();
+      const resultData = await demoRes.json();
       onAnalysisComplete(resultData);
     } catch (err) {
       setErrorMsg(err.message);
@@ -109,7 +102,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
-            onClick={() => handleDemoSample('data/raw/real_human_face.mp4')}
+            onClick={() => handleDemoSample('real_human_face')}
             disabled={loading}
             className="btn-secondary"
             style={{ fontSize: '0.85rem', borderColor: 'rgba(16, 185, 129, 0.4)' }}
@@ -119,7 +112,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
           </button>
 
           <button
-            onClick={() => handleDemoSample('data/raw/authentic_sample.mp4')}
+            onClick={() => handleDemoSample('authentic_sample')}
             disabled={loading}
             className="btn-secondary"
             style={{ fontSize: '0.85rem', borderColor: 'rgba(16, 185, 129, 0.4)' }}
@@ -129,7 +122,7 @@ export default function VideoUpload({ onAnalysisComplete, loading, setLoading })
           </button>
 
           <button
-            onClick={() => handleDemoSample('data/raw/synthetic_sample.mp4')}
+            onClick={() => handleDemoSample('synthetic_sample')}
             disabled={loading}
             className="btn-secondary"
             style={{ fontSize: '0.85rem', borderColor: 'rgba(244, 63, 94, 0.4)' }}
