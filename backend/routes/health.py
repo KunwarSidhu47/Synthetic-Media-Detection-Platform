@@ -2,9 +2,8 @@
 Health check route endpoint.
 """
 
-from fastapi import APIRouter
-import torch
 import time
+from fastapi import APIRouter
 
 router = APIRouter(tags=["Health"])
 
@@ -13,14 +12,18 @@ router = APIRouter(tags=["Health"])
 def health_check():
     """
     Service health check endpoint.
-    Returns API status, PyTorch compute device, and server timestamp.
+    Returns API status, PyTorch compute device (if available), and server timestamp.
     """
-    if torch.cuda.is_available():
-        device_type = "cuda"
-    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-        device_type = "mps"
-    else:
-        device_type = "cpu"
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device_type = "cuda"
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            device_type = "mps"
+        else:
+            device_type = "cpu"
+    except ImportError:
+        device_type = "cpu (torch not installed)"
 
     return {
         "status": "healthy",
