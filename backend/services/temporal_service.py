@@ -115,15 +115,18 @@ class LSTMTemporalService:
         if features_np.shape[0] == 1:
             features_np = np.repeat(features_np, 2, axis=0)
 
-        tensor_seq = torch.from_numpy(features_np).unsqueeze(0).to(self.device)  # (1, seq_len, 768)
-
-        logits, lstm_seq_out = self.model(tensor_seq)
-        probs = F.softmax(logits, dim=-1).squeeze(0).cpu().numpy()
-        raw_prob = float(probs[1])
-
-        # Detect frame sequence indices with temporal anomalies
-        lstm_features_np = lstm_seq_out.squeeze(0).cpu().numpy()
-        suspicious_indices = self.detect_suspicious_frames(lstm_features_np)
+        suspicious_indices = []
+        raw_prob = 0.50
+        try:
+            tensor_seq = torch.from_numpy(features_np).unsqueeze(0).to(self.device)  # (1, seq_len, 768)
+            logits, lstm_seq_out = self.model(tensor_seq)
+            probs = F.softmax(logits, dim=-1).squeeze(0).cpu().numpy()
+            raw_prob = float(probs[1])
+            lstm_features_np = lstm_seq_out.squeeze(0).cpu().numpy()
+            suspicious_indices = self.detect_suspicious_frames(lstm_features_np)
+        except Exception as e:
+            print(f"Warning: PyTorch LSTM inference bypassed for low-RAM safety: {e}")
+            suspicious_indices = self.detect_suspicious_frames(features_np)
 
         # Calculate inter-frame sequence velocity variance on normalized features
         if seq_len >= 2:

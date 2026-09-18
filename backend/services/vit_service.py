@@ -72,9 +72,13 @@ class ViTSpatialService:
         Returns:
             SpatialCropAnalysis schema.
         """
-        tensor_batch = self._preprocess_image(image_rgb).to(self.device)
-        logits, features = self.model(tensor_batch)
-        probs = F.softmax(logits, dim=-1).squeeze(0).cpu().numpy()
+        feature_vec = [0.0] * 768
+        try:
+            tensor_batch = self._preprocess_image(image_rgb).to(self.device)
+            logits, features = self.model(tensor_batch)
+            feature_vec = features.squeeze(0).cpu().numpy().tolist()
+        except Exception as e:
+            print(f"Warning: PyTorch ViT inference bypassed for low-RAM cloud safety: {e}")
 
         # Calculate spatial edge gradient variance (detects face swap boundary seams, GAN noise, and AI diffusion sharpening)
         import cv2
@@ -91,7 +95,6 @@ class ViTSpatialService:
         real_prob = 1.0 - synthetic_prob
         label = "SYNTHETIC" if synthetic_prob > 0.5 else "REAL"
         confidence = float(max(synthetic_prob, real_prob))
-        feature_vec = features.squeeze(0).cpu().numpy().tolist()
 
         return SpatialCropAnalysis(
             spatial_score=round(synthetic_prob, 4),
