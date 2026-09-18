@@ -52,11 +52,37 @@ class MultiSignalFusionService:
         self.w_frequency = w_frequency / total_w
         self.w_temporal = w_temporal / total_w
 
-        # Initialize sub-services
-        self.face_detector = FaceDetector(min_detection_confidence=0.4)
-        self.vit_service = ViTSpatialService(device=device, pretrained=pretrained_vit)
-        self.freq_service = FrequencyAnalysisService()
-        self.temporal_service = LSTMTemporalService(device=device)
+        self._device = device
+        self._pretrained_vit = pretrained_vit
+
+        self._face_detector = None
+        self._vit_service = None
+        self._freq_service = None
+        self._temporal_service = None
+
+    @property
+    def face_detector(self):
+        if self._face_detector is None:
+            self._face_detector = FaceDetector(min_detection_confidence=0.4)
+        return self._face_detector
+
+    @property
+    def vit_service(self):
+        if self._vit_service is None:
+            self._vit_service = ViTSpatialService(device=self._device, pretrained=self._pretrained_vit)
+        return self._vit_service
+
+    @property
+    def freq_service(self):
+        if self._freq_service is None:
+            self._freq_service = FrequencyAnalysisService()
+        return self._freq_service
+
+    @property
+    def temporal_service(self):
+        if self._temporal_service is None:
+            self._temporal_service = LSTMTemporalService(device=self._device)
+        return self._temporal_service
 
     def fuse_scores(
         self,
